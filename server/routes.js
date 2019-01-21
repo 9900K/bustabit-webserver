@@ -221,8 +221,8 @@ module.exports = function(app) {
 
 
     // Admin stuff
-    app.get('/admin-giveaway', adminRestrict, admin.giveAway);
-    app.post('/admin-giveaway', adminRestrict, admin.giveAwayHandle);
+    app.get('/admin-giveaway', Restrict, admin.giveAway);
+    app.post('/admin-giveaway', Restrict, admin.giveAwayHandle);
 
     app.get('*', function(req, res) {
         res.status(404);
