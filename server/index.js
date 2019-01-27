@@ -12,6 +12,7 @@ var ioCookieParser = require('socket.io-cookie');
 var _ = require('lodash');
 var debug = require('debug')('app:index');
 var app = express();
+var router = express.Router();
 
 var config = require('../config/config');
 var routes = require('./routes');
