@@ -185,8 +185,7 @@ router.get('/leaderboard', games.getLeaderBoard);
 router.get('/game/:id', games.show);
 router.get('/user/:name', user.profile);
 
-router.get('/error', function(req, res, next) { // Sometimes we redirect 
-  people to /error
+router.get('/error', function(req, res, next) { // Sometimes we redirect people to /error
   return res.render('error');
 });
 
