@@ -8,7 +8,7 @@ var sendEmail = require('./sendEmail');
 var stats = require('./stats');
 var config = require('../config/config');
 var recaptchaValidator = require('recaptcha-validator');
-var router = require('express').Router();
+var router = require('express').Router(); router.get('/', (req, res) => {});
 
 
 var production = process.env.NODE_ENV === 'production';
