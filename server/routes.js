@@ -8,6 +8,7 @@ var sendEmail = require('./sendEmail');
 var stats = require('./stats');
 var config = require('../config/config');
 var recaptchaValidator = require('recaptcha-validator');
+var router = require('express').Router();
 
 
 var production = process.env.NODE_ENV === 'production';
@@ -157,76 +158,77 @@ function requestDevOtt(id, callback) {
     });
 }
 
-module.exports = function(router) {
+router.get('/', tableNew()); // Changed the default index page to play page 
+{staticPageLogged('index')}
+router.get('/register', staticPageLogged('register', '/play'));
+router.get('/login', staticPageLogged('login', '/play'));
+router.get('/reset/:recoverId', user.validateResetPassword);
+router.get('/faq', staticPageLogged('faq'));
+router.get('/contact', staticPageLogged('contact'));
+router.get('/request', restrict, user.request);
+router.get('/deposit', restrict, user.deposit);
+router.get('/withdraw', restrict, user.withdraw);
+router.get('/withdraw/request', restrict, user.withdrawRequest);
+router.get('/support', restrict, user.contact);
+router.get('/account', restrict, user.account);
+router.get('/security', restrict, user.security);
+router.get('/forgot-password', staticPageLogged('forgot-password'));
+router.get('/calculator', staticPageLogged('calculator'));
+router.get('/guide', staticPageLogged('guide'));
 
-    router.get('/', tableNew()); // Changed the default index page to play page {staticPageLogged('index')}
-    router.get('/register', staticPageLogged('register', '/play'));
-    router.get('/login', staticPageLogged('login', '/play'));
-    router.get('/reset/:recoverId', user.validateResetPassword);
-    router.get('/faq', staticPageLogged('faq'));
-    router.get('/contact', staticPageLogged('contact'));
-    router.get('/request', restrict, user.request);
-    router.get('/deposit', restrict, user.deposit);
-    router.get('/withdraw', restrict, user.withdraw);
-    router.get('/withdraw/request', restrict, user.withdrawRequest);
-    router.get('/support', restrict, user.contact);
-    router.get('/account', restrict, user.account);
-    router.get('/security', restrict, user.security);
-    router.get('/forgot-password', staticPageLogged('forgot-password'));
-    router.get('/calculator', staticPageLogged('calculator'));
-    router.get('/guide', staticPageLogged('guide'));
 
+router.get('/play-old', table());
+router.get('/play', tableNew());
+router.get('/play-id/:id', tableDev());
 
-    router.get('/play-old', table());
-    router.get('/play', tableNew());
-    router.get('/play-id/:id', tableDev());
+router.get('/leaderboard', games.getLeaderBoard);
+router.get('/game/:id', games.show);
+router.get('/user/:name', user.profile);
 
-    router.get('/leaderboard', games.getLeaderBoard);
-    router.get('/game/:id', games.show);
-    router.get('/user/:name', user.profile);
+router.get('/error', function(req, res, next) { // Sometimes we redirect 
+  people to /error
+  return res.render('error');
+});
 
-    router.get('/error', function(req, res, next) { // Sometimes we redirect people to /error
-      return res.render('error');
+router.post('/request', restrict, recaptchaRestrict, user.giveawayRequest);
+router.post('/sent-reset', user.resetPasswordRecovery);
+router.post('/sent-recover', recaptchaRestrict, user.sendPasswordRecover);
+router.post('/reset-password', restrict, user.resetPassword);
+router.post('/edit-email', restrict, user.editEmail);
+router.post('/enable-2fa', restrict, user.enableMfa);
+router.post('/disable-2fa', restrict, user.disableMfa);
+router.post('/withdraw-request', restrict, user.handleWithdrawRequest);
+router.post('/support', restrict, contact('support'));
+router.post('/contact', contact('contact'));
+router.post('/logout', restrictRedirectToHome, user.logout);
+router.post('/login', recaptchaRestrict, user.login);
+router.post('/register', recaptchaRestrict, user.register);
+
+router.post('/ott', restrict, function(req, res, next) {
+    var user = req.user;
+    var ipAddress = req.ip;
+    var userAgent = req.get('user-agent');
+    assert(user);
+    database.createOneTimeToken(user.id, ipAddress, userAgent, function(err, 
+    token) {
+        if (err) {
+            console.error('[INTERNAL_ERROR] unable to get OTT got ' + err);
+            res.status(500);
+            return res.send('Server internal error');
+        }
+        res.send(token);
     });
-
-    router.post('/request', restrict, recaptchaRestrict, user.giveawayRequest);
-    router.post('/sent-reset', user.resetPasswordRecovery);
-    router.post('/sent-recover', recaptchaRestrict, user.sendPasswordRecover);
-    router.post('/reset-password', restrict, user.resetPassword);
-    router.post('/edit-email', restrict, user.editEmail);
-    router.post('/enable-2fa', restrict, user.enableMfa);
-    router.post('/disable-2fa', restrict, user.disableMfa);
-    router.post('/withdraw-request', restrict, user.handleWithdrawRequest);
-    router.post('/support', restrict, contact('support'));
-    router.post('/contact', contact('contact'));
-    router.post('/logout', restrictRedirectToHome, user.logout);
-    router.post('/login', recaptchaRestrict, user.login);
-    router.post('/register', recaptchaRestrict, user.register);
-
-    router.post('/ott', restrict, function(req, res, next) {
-        var user = req.user;
-        var ipAddress = req.ip;
-        var userAgent = req.get('user-agent');
-        assert(user);
-        database.createOneTimeToken(user.id, ipAddress, userAgent, function(err, token) {
-            if (err) {
-                console.error('[INTERNAL_ERROR] unable to get OTT got ' + err);
-                res.status(500);
-                return res.send('Server internal error');
-            }
-            res.send(token);
-        });
-    });
-    router.get('/stats', stats.index);
+});
+router.get('/stats', stats.index);
 
 
-    // Admin stuff
-    router.get('/admin-giveaway', restrict, admin.giveAway);
-    router.post('/admin-giveaway', restrict, admin.giveAwayHandle);
+// Admin stuff
+router.get('/admin-giveaway', restrict, admin.giveAway);
+router.post('/admin-giveaway', restrict, admin.giveAwayHandle);
 
-    router.get('*', function(req, res) {
-        res.status(404);
-        res.render('404');
-    module.exports = router;
-    });
-};
+router.get('*', function(req, res) {
+    res.status(404);
+    res.render('404');
+});
+
+module.exports = router;
