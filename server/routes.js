@@ -157,7 +157,7 @@ function requestDevOtt(id, callback) {
     });
 }
 
-module.exports = function(router) {
+let router = require('express').router(),
 
     router.get('/', tableNew()); // Changed the default index page to play page {staticPageLogged('index')}
     router.get('/register', staticPageLogged('register', '/play'));
@@ -227,5 +227,6 @@ module.exports = function(router) {
     router.get('*', function(req, res) {
         res.status(404);
         res.render('404');
+    module.exports = router;
     });
 };
