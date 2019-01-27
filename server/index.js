@@ -171,7 +171,7 @@ function errorHandler(err, req, res, next) {
 
 }
 
-routes(app);
+app.use('/', routes);
 app.use(errorHandler);
 
 /**  Server **/
