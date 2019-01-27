@@ -157,7 +157,7 @@ function requestDevOtt(id, callback) {
     });
 }
 
-let router = require('express').router(),
+module.exports = function(router) {
 
     router.get('/', tableNew()); // Changed the default index page to play page {staticPageLogged('index')}
     router.get('/register', staticPageLogged('register', '/play'));
