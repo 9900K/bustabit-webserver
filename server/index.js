@@ -71,7 +71,10 @@ app.engine("html", require("dot-emc").init(
 
 
 /** Middleware **/
-app.use(bodyParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(cookieParser());
 app.use(compression());
 
