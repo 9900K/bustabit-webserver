@@ -157,53 +157,53 @@ function requestDevOtt(id, callback) {
     });
 }
 
-module.exports = function(app) {
+module.exports = function(router) {
 
-    app.get('/', tableNew()); // Changed the default index page to play page {staticPageLogged('index')}
-    app.get('/register', staticPageLogged('register', '/play'));
-    app.get('/login', staticPageLogged('login', '/play'));
-    app.get('/reset/:recoverId', user.validateResetPassword);
-    app.get('/faq', staticPageLogged('faq'));
-    app.get('/contact', staticPageLogged('contact'));
-    app.get('/request', restrict, user.request);
-    app.get('/deposit', restrict, user.deposit);
-    app.get('/withdraw', restrict, user.withdraw);
-    app.get('/withdraw/request', restrict, user.withdrawRequest);
-    app.get('/support', restrict, user.contact);
-    app.get('/account', restrict, user.account);
-    app.get('/security', restrict, user.security);
-    app.get('/forgot-password', staticPageLogged('forgot-password'));
-    app.get('/calculator', staticPageLogged('calculator'));
-    app.get('/guide', staticPageLogged('guide'));
+    router.get('/', tableNew()); // Changed the default index page to play page {staticPageLogged('index')}
+    router.get('/register', staticPageLogged('register', '/play'));
+    router.get('/login', staticPageLogged('login', '/play'));
+    router.get('/reset/:recoverId', user.validateResetPassword);
+    router.get('/faq', staticPageLogged('faq'));
+    router.get('/contact', staticPageLogged('contact'));
+    router.get('/request', restrict, user.request);
+    router.get('/deposit', restrict, user.deposit);
+    router.get('/withdraw', restrict, user.withdraw);
+    router.get('/withdraw/request', restrict, user.withdrawRequest);
+    router.get('/support', restrict, user.contact);
+    router.get('/account', restrict, user.account);
+    router.get('/security', restrict, user.security);
+    router.get('/forgot-password', staticPageLogged('forgot-password'));
+    router.get('/calculator', staticPageLogged('calculator'));
+    router.get('/guide', staticPageLogged('guide'));
 
 
-    app.get('/play-old', table());
-    app.get('/play', tableNew());
-    app.get('/play-id/:id', tableDev());
+    router.get('/play-old', table());
+    router.get('/play', tableNew());
+    router.get('/play-id/:id', tableDev());
 
-    app.get('/leaderboard', games.getLeaderBoard);
-    app.get('/game/:id', games.show);
-    app.get('/user/:name', user.profile);
+    router.get('/leaderboard', games.getLeaderBoard);
+    router.get('/game/:id', games.show);
+    router.get('/user/:name', user.profile);
 
-    app.get('/error', function(req, res, next) { // Sometimes we redirect people to /error
+    router.get('/error', function(req, res, next) { // Sometimes we redirect people to /error
       return res.render('error');
     });
 
-    app.post('/request', restrict, recaptchaRestrict, user.giveawayRequest);
-    app.post('/sent-reset', user.resetPasswordRecovery);
-    app.post('/sent-recover', recaptchaRestrict, user.sendPasswordRecover);
-    app.post('/reset-password', restrict, user.resetPassword);
-    app.post('/edit-email', restrict, user.editEmail);
-    app.post('/enable-2fa', restrict, user.enableMfa);
-    app.post('/disable-2fa', restrict, user.disableMfa);
-    app.post('/withdraw-request', restrict, user.handleWithdrawRequest);
-    app.post('/support', restrict, contact('support'));
-    app.post('/contact', contact('contact'));
-    app.post('/logout', restrictRedirectToHome, user.logout);
-    app.post('/login', recaptchaRestrict, user.login);
-    app.post('/register', recaptchaRestrict, user.register);
+    router.post('/request', restrict, recaptchaRestrict, user.giveawayRequest);
+    router.post('/sent-reset', user.resetPasswordRecovery);
+    router.post('/sent-recover', recaptchaRestrict, user.sendPasswordRecover);
+    router.post('/reset-password', restrict, user.resetPassword);
+    router.post('/edit-email', restrict, user.editEmail);
+    router.post('/enable-2fa', restrict, user.enableMfa);
+    router.post('/disable-2fa', restrict, user.disableMfa);
+    router.post('/withdraw-request', restrict, user.handleWithdrawRequest);
+    router.post('/support', restrict, contact('support'));
+    router.post('/contact', contact('contact'));
+    router.post('/logout', restrictRedirectToHome, user.logout);
+    router.post('/login', recaptchaRestrict, user.login);
+    router.post('/register', recaptchaRestrict, user.register);
 
-    app.post('/ott', restrict, function(req, res, next) {
+    router.post('/ott', restrict, function(req, res, next) {
         var user = req.user;
         var ipAddress = req.ip;
         var userAgent = req.get('user-agent');
@@ -217,14 +217,14 @@ module.exports = function(app) {
             res.send(token);
         });
     });
-    app.get('/stats', stats.index);
+    router.get('/stats', stats.index);
 
 
     // Admin stuff
-    app.get('/admin-giveaway', restrict, admin.giveAway);
-    app.post('/admin-giveaway', restrict, admin.giveAwayHandle);
+    router.get('/admin-giveaway', restrict, admin.giveAway);
+    router.post('/admin-giveaway', restrict, admin.giveAwayHandle);
 
-    app.get('*', function(req, res) {
+    router.get('*', function(req, res) {
         res.status(404);
         res.render('404');
     });
