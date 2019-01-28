@@ -7,6 +7,7 @@ var debug    =  require('debug')('app:chat');
 
 var db       =  require('./database');
 var lib      =  require('./lib');
+var channelName =
 
 /** How to use the chat on the client?
  *
